@@ -1,9 +1,135 @@
-apply from: 'script.gradle'
+plugins{
+    id 'java'
+    id 'war'
+}
 
+
+apply from: 'script.gradle'
+//apply plugin: CustomPlugin
+//apply plugin: "custom"
+//apply plugin: "java"
+
+
+repositories {
+    // ~/.m2/repository
+//    mavenLocal()
+    mavenCentral()
+//    maven {{
+//        name "nexus dmdev"
+//        uri "https://nexus.dmdev/repository"
+//    }}
+}
+
+configurations {
+    Configuration configurationImpl = getByName('implementation')
+    configurationImpl.getDependencies()
+    dmdev {
+        description = 'dmdev.configuration'
+    }
+
+    configurationImpl.extendsFrom(dmdev)
+}
+
+java{
+    sourceCompatibility=JavaVersion.VERSION_16
+    targetCompatibility=JavaVersion.VERSION_16
+}
+
+dependencies {
+//    add('implementation',['group': 'org.springframework','name': 'spring-webmvc', 'version': '5.3.9'])
+//    add('implementation','org.springframework:spring-webmvc:5.3.9')
+    implementation "org.springframework:spring-webmvc:5.3.9"
+    implementation 'jakarta.servlet:jakarta.servlet-api:5.0.0'
+    //compileOnly "jakarta.servlet:jacarta-servlet-api:5.0.0"
+
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-dependencies
+    compileOnly platform ('org.springframework.boot:spring-boot-dependencies:2.6.3')
+}
+
+jar{
+
+    def jars = configurations.runtimeClasspath.files.collect{"lib/$it.name"}
+
+
+    manifest {
+        attributes 'Main-Class': 'com.ash.HelloWorld',
+        "Class-Path": jars.join(' ')
+    }
+
+//    duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+//
+//    from(configurations.runtimeClasspath.files.collect{
+//        project.zipTree(it)
+//    })
+}
+
+task copyAllDependencies(type: Copy){
+    from(configurations.runtimeClasspath.files)
+    into("$buildDir/libs/lib")
+}
+
+war{
+    archiveName("ash.war")
+}
+
+//копирует вар в папку томкат
+task deployTomcat(type: Copy){
+    from(war.archiveFile.get())
+    into('/D:\\Download\\apache-tomcat-11.0.0-M4\\apache-tomcat-11.0.0-M4\\webapps')
+}
+
+deployTomcat.dependsOn war
+assemble.dependsOn(deployTomcat)
+
+
+jar.dependsOn copyAllDependencies
+
+configurations.runtimeClasspath.files.each {println()}
+
+sourceSets{
+    main{
+        java {
+            srcDir("$buildDir/generated-sources/querydsl")
+        }
+    }
+
+    test{
+
+    }
+}
+
+//buildSrc --id 'custom'
 class CustomPlugin implements Plugin<Project>{
 
     @Override
     void apply(Project project) {
-
+        addHelloTask(project)
     }
+
+
+
+    void addHelloTask(Project project){
+        def map =
+                [description: "Hello task",group: "dev", type: DefaultTask]
+        project.task(map,"hello"){
+            println "configuration phase. Task hello"
+            println("task: ${description}, group: ${group}, action: ${actions.size}")
+
+            doLast{
+                println "execution phase, Action 1"
+            }
+
+            doFirst {
+                println "execution phase, Action 2"
+            }
+
+            doLast{
+                println "execution phase, Action 3"
+            }
+
+            println("task: ${description}, group: ${group}, action: ${actions.size}")
+            println("path task $path")
+
+        }
+}
 }
