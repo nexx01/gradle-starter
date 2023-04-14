@@ -11,10 +11,21 @@ repositories {
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    implementation project(":service")
+    implementation project(":common:util")
+    implementation 'jakarta.servlet:jakarta.servlet-api:5.0.0'
+
 }
 
 test {
     useJUnitPlatform()
 }
+
+//копирует вар в папку томкат
+task deployTomcat(type: Copy){
+    from(war.archiveFile.get())
+    into('/D:\\Download\\apache-tomcat-11.0.0-M4\\apache-tomcat-11.0.0-M4\\webapps')
+}
+
+deployTomcat.dependsOn war
+assemble.dependsOn(deployTomcat)

@@ -1,3 +1,17 @@
+import org.apache.commons.lang3.StringUtils
+
+
+buildscript{
+    repositories{
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'org.apache.commons:commons-lang3:3.12.0'
+
+    }
+}
+
 plugins{
     id 'java'
     id 'war'
@@ -9,6 +23,18 @@ apply from: 'script.gradle'
 //apply plugin: "custom"
 //apply plugin: "java"
 
+
+//allprojects{
+//     StringUtils.capitalize("")
+//
+//    repositories{
+//        mavencentral()
+//    }
+//}
+////
+//subprojects {
+//
+//}
 
 repositories {
     // ~/.m2/repository
@@ -72,14 +98,7 @@ war{
     archiveName("ash.war")
 }
 
-//копирует вар в папку томкат
-task deployTomcat(type: Copy){
-    from(war.archiveFile.get())
-    into('/D:\\Download\\apache-tomcat-11.0.0-M4\\apache-tomcat-11.0.0-M4\\webapps')
-}
 
-deployTomcat.dependsOn war
-assemble.dependsOn(deployTomcat)
 
 
 jar.dependsOn copyAllDependencies
@@ -99,7 +118,7 @@ sourceSets{
 }
 
 //buildSrc --id 'custom'
-class CustomPlugin implements Plugin<Project>{
+class CustomPlugin2 implements Plugin<Project>{
 
     @Override
     void apply(Project project) {
