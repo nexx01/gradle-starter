@@ -1,7 +1,9 @@
+import task.ReleaseTask
+
 plugins {
     id 'java-library'
     id 'jacoco'
-    id 'cus'
+   // id 'cus'
 }
 
 //apply plugin: CustomPlugin
@@ -12,6 +14,7 @@ version 'unspecified'
 repositories {
     mavenCentral()
 }
+
 
 dependencies {
     api project(":database")
@@ -24,6 +27,18 @@ test {
     useJUnitPlatform()
     maxParallelForks 3
 }
+
+ext{
+    release = false
+}
+
+task  makeRelease(type: ReleaseTask){
+    release =project.release
+    releaseFile = new File("$rootDir/script.gradle")
+}
+//task makeRelease {
+//
+//}
 
 test.finalizedBy(jacocoTestReport)
 jacocoTestReport.dependsOn(test)
